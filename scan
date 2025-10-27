@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Sort array in ascending order
+void sort(int arr[], int size) {
+    for (int i = 0; i < size - 1; i++)
+        for (int j = i + 1; j < size; j++)
+            if (arr[i] > arr[j]) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+}
+
+void scan(int requests[], int n, int head, int disk_size, int direction) {
+    int seek = 0;
+    int left[n + 2], right[n + 2]; // Adjust array size for safety
+    int lcount = 0, rcount = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (requests[i] < head)
+            left[lcount++] = requests[i];
+        else
+            right[rcount++] = requests[i];
+    }
+
+    // Add ends
+    left[lcount++] = 0;
+    right[rcount++] = disk_size - 1;
+
+    // Sort both halves
+    sort(left, lcount);
+    sort(right, rcount);
+
+    printf("\nSeek Sequence: %d", head);
+
+    if (direction == 1) {  // Move Right
+        for (int i = 0; i < rcount; i++) {
+            seek += abs(head - right[i]);
+            head = right[i];
+            printf(" -> %d", head);
+        }
+        for (int i = lcount - 1; i >= 0; i--) {
+            seek += abs(head - left[i]);
+            head = left[i];
+            printf(" -> %d", head);
+        }
+    } else {  // Move Left
+        for (int i = lcount - 1; i >= 0; i--) {
+            seek += abs(head - left[i]);
+            head = left[i];
+            printf(" -> %d", head);
+        }
+        for (int i = 0; i < rcount; i++) {
+            seek += abs(head - right[i]);
+            head = right[i];
+            printf(" -> %d", head);
+        }
+    }
+
+    printf("\nTotal Seek Time: %d\n", seek);
+}
+
+int main() {
+    int n, head, disk_size, direction;
+    printf("Enter number of requests: ");
+    scanf("%d", &n);
+
+    int requests[n];
+    printf("Enter requests: ");
+    for (int i = 0; i < n; i++)
+        scanf("%d", &requests[i]);
+
+    printf("Enter head position: ");
+    scanf("%d", &head);
+    printf("Enter disk size: ");
+    scanf("%d", &disk_size);
+    printf("Enter direction (1 for right, 0 for left): ");
+    scanf("%d", &direction);
+
+    scan(requests, n, head, disk_size, direction);
+    return 0;
+}
